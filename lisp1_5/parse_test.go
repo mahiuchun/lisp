@@ -74,9 +74,8 @@ var quoteTests = []struct {
 }
 
 func (e *Expr) stringNoQuote() string {
-	var b strings.Builder
-	e.buildString(&b, false)
-	return b.String()
+	ss := e.buildString(false)
+	return strings.Join(ss, "")
 }
 
 func TestParseQuote(t *testing.T) {

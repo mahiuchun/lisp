@@ -53,32 +53,33 @@ func (e *Expr) String() string {
 	if e == nil {
 		return "nil"
 	}
-	var b strings.Builder
-	e.buildString(&b, true)
-	return b.String()
+	ss := make([]string, 0)
+	ss = append(ss, e.buildString(true)...)
+	return strings.Join(ss, "")
 }
 
 // buildString is the internals of the String method. simplifyQuote
 // specifies whether (quote expr) should be printed as 'expr.
-func (e *Expr) buildString(b *strings.Builder, simplifyQuote bool) {
+func (e *Expr) buildString(simplifyQuote bool) []string {
+	ss := make([]string, 0)
 	if e == nil {
-		b.WriteString("nil")
-		return
+		ss = append(ss, "nil")
+		return ss
 	}
 	if e.atom != nil {
-		e.atom.buildString(b)
-		return
+		ss = append(ss, e.atom.buildString()...)
+		return ss
 	}
 	// Simplify (quote a) to 'a.
 	if simplifyQuote && Car(e).getAtom() == tokQuote {
-		b.WriteByte('\'')
-		Car(Cdr(e)).buildString(b, simplifyQuote)
-		return
+		ss = append(ss, "'")
+		ss = append(ss, Car(Cdr(e)).buildString(simplifyQuote)...)
+		return ss
 	}
-	b.WriteByte('(')
+	ss = append(ss, "(")
 	for {
 		car, cdr := e.car, e.cdr
-		car.buildString(b, simplifyQuote)
+		ss = append(ss, car.buildString(simplifyQuote)...)
 		if cdr == nil {
 			break
 		}
@@ -86,14 +87,15 @@ func (e *Expr) buildString(b *strings.Builder, simplifyQuote bool) {
 			if cdr.atom.text == "nil" {
 				break
 			}
-			b.WriteString(" . ")
-			cdr.buildString(b, simplifyQuote)
+			ss = append(ss, " . ")
+			ss = append(ss, cdr.buildString(simplifyQuote)...)
 			break
 		}
-		b.WriteByte(' ')
+		ss = append(ss, " ")
 		e = cdr
 	}
-	b.WriteByte(')')
+	ss = append(ss, ")")
+	return ss
 }
 
 // Parser is the parser for lists.

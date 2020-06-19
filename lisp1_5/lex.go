@@ -10,7 +10,6 @@ import (
 	"io"
 	"math/big"
 	"os"
-	"strings"
 	"unicode"
 )
 
@@ -47,12 +46,14 @@ func (t token) String() string {
 	return t.text
 }
 
-func (t token) buildString(b *strings.Builder) {
+func (t token) buildString() []string {
+	ss := make([]string, 0)
 	if t.typ == tokenNumber {
-		b.WriteString(fmt.Sprint(t.num))
+		ss = append(ss, fmt.Sprint(t.num))
 	} else {
-		b.WriteString(t.text)
+		ss = append(ss, t.text)
 	}
+	return ss
 }
 
 type lexer struct {

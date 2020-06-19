@@ -105,20 +105,21 @@ func (c *Context) StackTrace() string {
 	if c.scope[len(c.scope)-1].fn == top {
 		return ""
 	}
-	var b strings.Builder
-	fmt.Fprintln(&b, "stack:")
+	// var b strings.Builder
+	ss := make([]string, 0)
+	ss = append(ss, fmt.Sprintln("stack:"))
 	for i := len(c.scope) - 1; i > 0; i-- {
 		if len(c.scope)-i > 20 && i > 20 { // Skip the middle bits.
 			i = 20
-			fmt.Fprintln(&b, "\t...")
+			ss = append(ss, fmt.Sprintln("\t..."))
 			continue
 		}
 		s := c.scope[i]
 		if s.fn != top {
-			fmt.Fprintf(&b, "\t(%s %s)\n", s.fn, Car(s.args))
+			ss = append(ss, fmt.Sprintf("\t(%s %s)\n", s.fn, Car(s.args)))
 		}
 	}
-	return b.String()
+	return strings.Join(ss, "")
 }
 
 // getScope returns the scope in which the token is set.
